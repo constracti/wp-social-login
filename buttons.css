@@ -1,0 +1,8 @@
+.kgr-social-login-p>a {
+	text-decoration: none;
+}
+
+.kgr-social-login-p>a>img {
+	height: 48px;
+	width: 48px;
+}
