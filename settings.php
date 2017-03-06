@@ -131,7 +131,6 @@ add_action( 'admin_enqueue_scripts', function( string $hook ) {
 add_action( 'wp_ajax_kgr-social-login-clear', function() {
 	if ( !current_user_can( 'administrator' ) )
 		exit;
-	exit( 'ok' );
 	foreach ( ['google', 'microsoft', 'yahoo'] as $provider )
 		foreach ( ['client-id', 'client-secret'] as $credential )
 			delete_option( sprintf( 'kgr-social-login-%s-%s', $provider, $credential ) );
