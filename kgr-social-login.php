@@ -5,7 +5,7 @@
  * Plugin URI: https://github.com/constracti/wp-social-login
  * Description: Users can register or login with their google, microsoft or yahoo account.
  * Author: constracti
- * Version: 1.1.1
+ * Version: 1.2
  * License: GPL2
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  */
@@ -24,18 +24,20 @@ require_once( plugin_dir_path( __FILE__ ) . 'settings.php' );
 
 function kgr_social_login_p( string $redirect_to ): string {
 	$str = 'admin-ajax.php?action=kgr-social-login-%s&redirect_to=%s&login';
-	$url = plugins_url( 'images' , __FILE__ );
+	$src = plugins_url( 'images' , __FILE__ );
 	$html = '';
 	$html .= '<p class="kgr-social-login-p">' . "\n";
-	$html .= sprintf( '<a href="%s" title="%s">', admin_url( sprintf( $str, 'google', urlencode( $redirect_to ) ) ), 'Google' ) . "\n";
-	$html .= sprintf( '<img src="%s/%s.png" alt="%s" />', $url, 'google', 'google' ) . "\n";
-	$html .= '</a>' . "\n";
-	$html .= sprintf( '<a href="%s" title="%s">', admin_url( sprintf( $str, 'microsoft', urlencode( $redirect_to ) ) ), 'Microsoft' ) . "\n";
-	$html .= sprintf( '<img src="%s/%s.png" alt="%s" />', $url, 'microsoft', 'microsoft' ) . "\n";
-	$html .= '</a>' . "\n";
-	$html .= sprintf( '<a href="%s" title="%s">', admin_url( sprintf( $str, 'yahoo', urlencode( $redirect_to ) ) ), 'Yahoo' ) . "\n";
-	$html .= sprintf( '<img src="%s/%s.png" alt="%s" />', $url, 'yahoo', 'yahoo' ) . "\n";
-	$html .= '</a>' . "\n";
+	foreach ( ['google', 'microsoft', 'yahoo'] as $provider ) {
+		$flag = TRUE;
+		foreach ( ['client-id', 'client-secret'] as $credential )
+			$flag = $flag && get_option( sprintf( 'kgr-social-login-%s-%s', $provider, $credential ), '' ) !== '';
+		if ( !$flag )
+			continue;
+		$href = admin_url( sprintf( $str, $provider, urlencode( $redirect_to ) ) );
+		$html .= sprintf( '<a href="%s" title="%s">', $href, ucfirst( $provider ) ) . "\n";
+		$html .= sprintf( '<img src="%s/%s.png" alt="%s" />', $src, $provider, $provider ) . "\n";
+		$html .= '</a>' . "\n";
+	}
 	$html .= '</p>' . "\n";
 	return $html;
 }
