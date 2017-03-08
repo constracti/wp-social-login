@@ -5,7 +5,7 @@
  * Plugin URI: https://github.com/constracti/wp-social-login
  * Description: Users can register or login with their google, microsoft or yahoo account.
  * Author: constracti
- * Version: 1.2
+ * Version: 1.2.1
  * License: GPL2
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  */
@@ -111,7 +111,7 @@ function kgr_social_login_callback( $provider, $scope ) {
 		} else {
 			kgr_social_login_error( 'new users can\'t register' );
 		}
-		wp_set_auth_cookie( $user_id );
+		wp_set_auth_cookie( $user_id, TRUE ); # TODO option remember
 		header( 'location: ' . urldecode( $_GET['state'] ) );
 		exit;
 	} elseif ( array_key_exists( 'error', $_GET ) ) {
