@@ -4,7 +4,7 @@ if ( !defined( 'ABSPATH' ) )
 	exit;
 
 add_filter( 'plugin_action_links_kgr-social-login/kgr-social-login.php', function( array $links ): array {
-	$links[] = sprintf( '<a href="%s">%s</a>', admin_url( 'options-general.php?page=kgr-social-login' ), 'Options' );
+	$links[] = sprintf( '<a href="%s">%s</a>', admin_url( 'options-general.php?page=kgr-social-login' ), 'Settings' );
 	return $links;
 } );
 
@@ -14,7 +14,7 @@ add_action( 'admin_menu', function() {
 	$page_title = 'KGR Social Login';
 	$menu_title = 'KGR Social Login';
 	$menu_slug = 'kgr-social-login';
-	$function = 'kgr_social_login_options_page';
+	$function = 'kgr_social_login_settings_page';
 	add_submenu_page( 'options-general.php', $page_title, $menu_title, 'administrator', $menu_slug, $function );
 } );
 
@@ -25,11 +25,11 @@ add_action( 'admin_init', function() {
 	// Google credentials
 	$section = 'kgr-social-login-google-credentials';
 	add_settings_section( $section, 'Google credentials', function() {
-		echo '<a href="https://github.com/thephpleague/oauth2-google">github</a>' . "\n" .
+		echo '<a href="https://github.com/thephpleague/oauth2-google" target="_blank">github</a>' . "\n" .
 			'<span>|</span>' . "\n" .
-			'<a href="https://console.developers.google.com/">applications</a>' . "\n" .
+			'<a href="https://console.developers.google.com/" target="_blank">applications</a>' . "\n" .
 			'<span>|</span>' . "\n" .
-			'<a href="https://myaccount.google.com/permissions">permissions</a>' . "\n";
+			'<a href="https://myaccount.google.com/permissions" target="_blank">permissions</a>' . "\n";
 	}, $group );
 	// Google Client ID
 	$name = 'kgr-social-login-google-client-id';
@@ -50,11 +50,11 @@ add_action( 'admin_init', function() {
 	// Microsoft credentials
 	$section = 'kgr-social-login-microsoft-credentials';
 	add_settings_section( $section, 'Microsoft credentials', function() {
-		echo '<a href="https://github.com/stevenmaguire/oauth2-microsoft">github</a>' . "\n" .
+		echo '<a href="https://github.com/stevenmaguire/oauth2-microsoft" target="_blank">github</a>' . "\n" .
 			'<span>|</span>' . "\n" .
-			'<a href="https://apps.dev.microsoft.com/">applications</a>' . "\n" .
+			'<a href="https://apps.dev.microsoft.com/" target="_blank">applications</a>' . "\n" .
 			'<span>|</span>' . "\n" .
-			'<a href="https://account.live.com/consent/Manage">permissions</a>' . "\n";
+			'<a href="https://account.live.com/consent/Manage" target="_blank">permissions</a>' . "\n";
 	}, $group );
 	// Microsoft Client ID
 	$name = 'kgr-social-login-microsoft-client-id';
@@ -75,11 +75,11 @@ add_action( 'admin_init', function() {
 	// Yahoo credentials
 	$section = 'kgr-social-login-yahoo-credentials';
 	add_settings_section( $section, 'Yahoo credentials', function() {
-		echo '<a href="https://github.com/hayageek/oauth2-yahoo">github</a>' . "\n" .
+		echo '<a href="https://github.com/hayageek/oauth2-yahoo" target="_blank">github</a>' . "\n" .
 			'<span>|</span>' . "\n" .
-			'<a href="https://developer.yahoo.com/apps/">applications</a>' . "\n" .
+			'<a href="https://developer.yahoo.com/apps/" target="_blank">applications</a>' . "\n" .
 			'<span>|</span>' . "\n" .
-			'<a href="https://login.yahoo.com/account/activity">permissions</a>' . "\n";
+			'<a href="https://login.yahoo.com/account/activity" target="_blank">permissions</a>' . "\n";
 	}, $group );
 	// Yahoo Client ID
 	$name = 'kgr-social-login-yahoo-client-id';
@@ -99,7 +99,7 @@ add_action( 'admin_init', function() {
 	}, $group, $section );
 } );
 
-function kgr_social_login_options_page() {
+function kgr_social_login_settings_page() {
 	if ( !current_user_can( 'administrator' ) )
 		return;
 	echo '<div class="wrap">' . "\n";
