@@ -22,6 +22,27 @@ add_action( 'admin_init', function() {
 	if ( !current_user_can( 'administrator' ) )
 		return;
 	$group = 'kgr-social-login';
+	// General settings
+	$section = 'kgr-social-login';
+	add_settings_section( $section, '', '__return_null', $group );
+	// Remember
+	$name = 'kgr-social-login-remember';
+	register_setting( $group, $name );
+	add_settings_field( $name, sprintf( '<label for="%s">Remember user</label>', $name ), function() {
+		$name = 'kgr-social-login-remember';
+		$value = get_option( $name, '' );
+		$checked = checked( $value, 'on', FALSE );
+		echo sprintf( '<input type="checkbox" name="%s" id="%s" value="on"%s />', $name, $name, $checked ) . "\n";
+?>
+<p class="description">
+	When this option is set, the user is logged in for 14 days.
+	<br />
+	Otherwise, this period is limited to 2 days and only for the current session.
+	<br />
+	For more details, see <a href="https://developer.wordpress.org/reference/functions/wp_set_auth_cookie/" target="_blank">WordPress Function Reference</a>.
+</p>
+<?php
+	}, $group, $section );
 	// Google credentials
 	$section = 'kgr-social-login-google-credentials';
 	add_settings_section( $section, 'Google credentials', function() {
@@ -99,17 +120,22 @@ add_action( 'admin_init', function() {
 	}, $group, $section );
 } );
 
+function kgr_social_login_notice( string $class, string $dashicon, string $message ) {
+?>
+<div class="notice notice-<?= $class ?>">
+	<p class="dashicons-before dashicons-<?= $dashicon ?>"><?= $message ?></p>
+</div>
+<?php
+}
+
 function kgr_social_login_settings_page() {
 	if ( !current_user_can( 'administrator' ) )
 		return;
 	echo '<div class="wrap">' . "\n";
 	echo sprintf( '<h1>%s</h1>', 'KGR Social Login' ) . "\n";
+	kgr_social_login_notice( 'info', 'info', 'Leave credentials empty to disable a social login option.' );
 	if ( intval( get_option( 'users_can_register' ) ) !== 1 )
-		echo '<div class="notice notice-warning">' . "\n" .
-		sprintf( '<p class="dashicons-before dashicons-warning">New users can\'t register. Set option <a href="%s">here</a>.</p>',
-			admin_url( 'options-general.php' )
-		) . "\n" .
-		'</div>' . "\n";
+		kgr_social_login_notice( 'warning', 'warning', sprintf( 'New users can\'t register. Set option <a href="%s">here</a>.', admin_url( 'options-general.php' ) ) );
 	echo '<form method="post" action="options.php">' . "\n";
 	settings_fields( 'kgr-social-login' );
 	do_settings_sections( 'kgr-social-login' );
