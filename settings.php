@@ -4,7 +4,7 @@ if ( !defined( 'ABSPATH' ) )
 	exit;
 
 add_filter( 'plugin_action_links_kgr-social-login/kgr-social-login.php', function( array $links ): array {
-	$links[] = sprintf( '<a href="%s">%s</a>', admin_url( 'options-general.php?page=kgr-social-login' ), 'Settings' );
+	$links[] = sprintf( '<a href="%s">%s</a>', menu_page_url( 'kgr-social-login', FALSE ), 'Settings' );
 	return $links;
 } );
 
