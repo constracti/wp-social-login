@@ -46,11 +46,18 @@ add_action( 'admin_init', function() {
 	// Google credentials
 	$section = 'kgr-social-login-google-credentials';
 	add_settings_section( $section, 'Google credentials', function() {
+		$redirect_url = admin_url( 'admin-ajax.php?action=kgr-social-login-google' );
 		echo '<a href="https://github.com/thephpleague/oauth2-google" target="_blank">github</a>' . "\n" .
 			'<span>|</span>' . "\n" .
 			'<a href="https://console.developers.google.com/" target="_blank">applications</a>' . "\n" .
 			'<span>|</span>' . "\n" .
 			'<a href="https://myaccount.google.com/permissions" target="_blank">permissions</a>' . "\n";
+		echo '<ol>' . "\n" .
+			'<li>Enable <i>Google+ API</i>.</li>' . "\n" .
+			'<li>Create <i>OAuth client ID</i> and choose type <i>Web application</i>.</li>' . "\n" .
+			sprintf( '<li>Add <code>%s</code> to <i>Authorized JavaScript origins</i>.</li>', home_url() ) . "\n" .
+			sprintf( '<li>Add <code>%s</code> to <i>Authorized redirect URIs</i>.</li>', $redirect_url ) . "\n" .
+			'</ol>' . "\n";
 	}, $group );
 	// Google Client ID
 	$name = 'kgr-social-login-google-client-id';
@@ -71,11 +78,16 @@ add_action( 'admin_init', function() {
 	// Microsoft credentials
 	$section = 'kgr-social-login-microsoft-credentials';
 	add_settings_section( $section, 'Microsoft credentials', function() {
+		$redirect_url = admin_url( 'admin-ajax.php' );
 		echo '<a href="https://github.com/stevenmaguire/oauth2-microsoft" target="_blank">github</a>' . "\n" .
 			'<span>|</span>' . "\n" .
 			'<a href="https://apps.dev.microsoft.com/" target="_blank">applications</a>' . "\n" .
 			'<span>|</span>' . "\n" .
 			'<a href="https://account.live.com/consent/Manage" target="_blank">permissions</a>' . "\n";
+		echo '<ol>' . "\n" .
+			'<li>Add a <i>Web</i> platform.</li>' . "\n" .
+			sprintf( '<li>Add <code>%s</code> to <i>Redirect URIs</i>.</li>', $redirect_url ) . "\n" .
+			'</ol>' . "\n";
 	}, $group );
 	// Microsoft Client ID
 	$name = 'kgr-social-login-microsoft-client-id';
@@ -101,6 +113,10 @@ add_action( 'admin_init', function() {
 			'<a href="https://developer.yahoo.com/apps/" target="_blank">applications</a>' . "\n" .
 			'<span>|</span>' . "\n" .
 			'<a href="https://login.yahoo.com/account/activity" target="_blank">permissions</a>' . "\n";
+		echo '<ol>' . "\n" .
+			'<li>Create a <i>Web Application</i>.</li>' . "\n" .
+			sprintf( '<li>Set <code>%s</code> as the <i>Callback Domain</i>.</li>', home_url() ) . "\n" .
+			'</ol>' . "\n";
 	}, $group );
 	// Yahoo Client ID
 	$name = 'kgr-social-login-yahoo-client-id';
