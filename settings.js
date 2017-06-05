@@ -1,9 +1,9 @@
-jQuery( function() {
+jQuery( document ).ready( function( $ ) {
 
-jQuery( '#kgr-social-login-clear' ).click( function() {
+$( '#kgr-social-login-clear' ).click( function() {
 	if ( !confirm( 'Clear all credentials?' ) )
 		return false;
-	jQuery.get( jQuery( this ).prop( 'href' ), function() {
+	$.get( $( this ).prop( 'href' ), function() {
 		location.href = '';
 	} );
 	return false;

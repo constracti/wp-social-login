@@ -167,14 +167,14 @@ add_action( 'admin_enqueue_scripts', function( string $hook ) {
 		return;
 	if ( $hook !== 'settings_page_kgr-social-login' )
 		return;
-	wp_enqueue_script( 'kgr-social-login-settings', plugins_url( 'settings.js', __FILE__ ), ['jquery'] );
+	wp_enqueue_script( 'kgr-social-login-settings', plugins_url( 'settings.js', __FILE__ ), [ 'jquery' ] );
 } );
 
 add_action( 'wp_ajax_kgr-social-login-clear', function() {
 	if ( !current_user_can( 'administrator' ) )
 		exit;
-	foreach ( ['google', 'microsoft', 'yahoo'] as $provider )
-		foreach ( ['client-id', 'client-secret'] as $credential )
+	foreach ( [ 'google', 'microsoft', 'yahoo' ] as $provider )
+		foreach ( [ 'client-id', 'client-secret' ] as $credential )
 			delete_option( sprintf( 'kgr-social-login-%s-%s', $provider, $credential ) );
 	exit;
 } );
