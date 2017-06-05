@@ -5,7 +5,7 @@
  * Plugin URI: https://github.com/constracti/wp-social-login
  * Description: Users can register or login with their google, microsoft or yahoo account.
  * Author: constracti
- * Version: 1.3.1
+ * Version: 1.3.2
  * License: GPL2
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  */
@@ -23,19 +23,21 @@ if ( !defined( 'ABSPATH' ) )
 require_once( plugin_dir_path( __FILE__ ) . 'settings.php' );
 
 function kgr_social_login_p( string $redirect_to ): string {
-	$str = 'admin-ajax.php?action=kgr-social-login-%s&redirect_to=%s&login';
-	$src = plugins_url( 'images' , __FILE__ );
 	$html = '';
 	$html .= '<p class="kgr-social-login-p">' . "\n";
-	foreach ( ['google', 'microsoft', 'yahoo'] as $provider ) {
+	foreach ( [ 'google', 'microsoft', 'yahoo' ] as $provider ) {
 		$flag = TRUE;
-		foreach ( ['client-id', 'client-secret'] as $credential )
+		foreach ( [ 'client-id', 'client-secret' ] as $credential )
 			$flag = $flag && get_option( sprintf( 'kgr-social-login-%s-%s', $provider, $credential ), '' ) !== '';
 		if ( !$flag )
 			continue;
-		$href = admin_url( sprintf( $str, $provider, urlencode( $redirect_to ) ) );
-		$html .= sprintf( '<a href="%s" title="%s">', $href, ucfirst( $provider ) ) . "\n";
-		$html .= sprintf( '<img src="%s/%s.png" alt="%s" />', $src, $provider, $provider ) . "\n";
+		$href = admin_url( sprintf( 'admin-ajax.php?action=kgr-social-login-%s&redirect_to=%s&login',
+			$provider,
+			urlencode( $redirect_to )
+		) );
+		$src = sprintf( '%s/%s.png', plugins_url( 'images' , __FILE__ ), $provider );
+		$html .= sprintf( '<a href="%s" title="%s">', esc_url( $href ), esc_attr( ucfirst( $provider ) ) ) . "\n";
+		$html .= sprintf( '<img src="%s" alt="%s" />', esc_url( $src ), esc_attr( $provider ) ) . "\n";
 		$html .= '</a>' . "\n";
 	}
 	$html .= '</p>' . "\n";
@@ -47,7 +49,7 @@ add_shortcode( 'kgr-social-login', function( $atts ): string {
 		return '';
 	$html = '';
 	if ( array_key_exists( 'prompt', $atts ) )
-		$html .= sprintf( '<p>%s</p>', $atts['prompt'] ) . "\n";
+		$html .= sprintf( '<p>%s</p>', esc_html( $atts['prompt'] ) ) . "\n";
 	$html .= kgr_social_login_p( get_permalink() );
 	return $html;
 } );
@@ -58,7 +60,7 @@ add_action( 'wp_enqueue_scripts', function() {
 
 add_action( 'login_enqueue_scripts', function() {
 	wp_enqueue_style( 'kgr-social-login-buttons', plugins_url( 'buttons.css', __FILE__ ) );
-	wp_enqueue_script( 'kgr-social-login-form', plugins_url( 'form.js', __FILE__ ), ['jquery'] );
+	wp_enqueue_script( 'kgr-social-login-form', plugins_url( 'form.js', __FILE__ ), [ 'jquery' ] );
 } );
 
 add_action( 'login_form', function() {

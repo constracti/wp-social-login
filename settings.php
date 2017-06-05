@@ -28,11 +28,11 @@ add_action( 'admin_init', function() {
 	// Remember
 	$name = 'kgr-social-login-remember';
 	register_setting( $group, $name );
-	add_settings_field( $name, sprintf( '<label for="%s">Remember user</label>', $name ), function() {
+	add_settings_field( $name, sprintf( '<label for="%s">%s</label>', esc_attr( $name ), esc_html( 'Remember user' ) ), function() {
 		$name = 'kgr-social-login-remember';
 		$value = get_option( $name, '' );
 		$checked = checked( $value, 'on', FALSE );
-		echo sprintf( '<input type="checkbox" name="%s" id="%s" value="on"%s />', $name, $name, $checked ) . "\n";
+		echo sprintf( '<input type="checkbox" name="%s" id="%s" value="on"%s />', esc_attr( $name ), esc_attr( $name ), $checked ) . "\n";
 ?>
 <p class="description">
 	When this option is set, the user is logged in for 14 days.
@@ -62,18 +62,18 @@ add_action( 'admin_init', function() {
 	// Google Client ID
 	$name = 'kgr-social-login-google-client-id';
 	register_setting( $group, $name );
-	add_settings_field( $name, sprintf( '<label for="%s">Client ID</label>', $name ), function() {
+	add_settings_field( $name, sprintf( '<label for="%s">%s</label>', esc_attr( $name ), esc_html( 'Client ID' ) ), function() {
 		$name = 'kgr-social-login-google-client-id';
 		$value = get_option( $name, '' );
-		echo sprintf( '<input type="text" name="%s" id="%s" class="regular-text" placeholder="Client ID" autocomplete="off" value="%s" />', $name, $name, $value ) . "\n";
+		echo sprintf( '<input type="text" name="%s" id="%s" class="regular-text" placeholder="%s" autocomplete="off" value="%s" />', esc_attr( $name ), esc_attr( $name ), esc_attr( 'Client ID' ), esc_attr( $value ) ) . "\n";
 	}, $group, $section );
 	// Google Client secret
 	$name = 'kgr-social-login-google-client-secret';
 	register_setting( $group, $name );
-	add_settings_field( $name, sprintf( '<label for="%s">Client secret</label>', $name ), function() {
+	add_settings_field( $name, sprintf( '<label for="%s">%s</label>', esc_attr( $name ), esc_html( 'Client secret' ) ), function() {
 		$name = 'kgr-social-login-google-client-secret';
 		$value = get_option( $name, '' );
-		echo sprintf( '<input type="text" name="%s" id="%s" class="regular-text" placeholder="Client secret" autocomplete="off" value="%s" />', $name, $name, $value ) . "\n";
+		echo sprintf( '<input type="text" name="%s" id="%s" class="regular-text" placeholder="%s" autocomplete="off" value="%s" />', esc_attr( $name ) , esc_attr( $name ), esc_attr( 'Client secret' ), esc_attr( $value ) ) . "\n";
 	}, $group, $section );
 	// Microsoft credentials
 	$section = 'kgr-social-login-microsoft-credentials';
@@ -92,18 +92,18 @@ add_action( 'admin_init', function() {
 	// Microsoft Client ID
 	$name = 'kgr-social-login-microsoft-client-id';
 	register_setting( $group, $name );
-	add_settings_field( $name, sprintf( '<label for="%s">Client ID</label>', $name ), function() {
+	add_settings_field( $name, sprintf( '<label for="%s">%s</label>', esc_attr( $name ), esc_html( 'Client ID' ) ), function() {
 		$name = 'kgr-social-login-microsoft-client-id';
 		$value = get_option( $name, '' );
-		echo sprintf( '<input type="text" name="%s" id="%s" class="regular-text" placeholder="Client ID" autocomplete="off" value="%s" />', $name, $name, $value ) . "\n";
+		echo sprintf( '<input type="text" name="%s" id="%s" class="regular-text" placeholder="%s" autocomplete="off" value="%s" />', esc_attr( $name ), esc_attr( $name ), esc_attr( 'Client ID' ), esc_attr( $value ) ) . "\n";
 	}, $group, $section );
 	// Microsoft Client secret
 	$name = 'kgr-social-login-microsoft-client-secret';
 	register_setting( $group, $name );
-	add_settings_field( $name, sprintf( '<label for="%s">Client secret</label>', $name ), function() {
+	add_settings_field( $name, sprintf( '<label for="%s">%s</label>', esc_attr( $name ), esc_html( 'Client secret' ) ), function() {
 		$name = 'kgr-social-login-microsoft-client-secret';
 		$value = get_option( $name, '' );
-		echo sprintf( '<input type="text" name="%s" id="%s" class="regular-text" placeholder="Client secret" autocomplete="off" value="%s" />', $name, $name, $value ) . "\n";
+		echo sprintf( '<input type="text" name="%s" id="%s" class="regular-text" placeholder="%s" autocomplete="off" value="%s" />', esc_attr( $name ) , esc_attr( $name ), esc_attr( 'Client secret' ), esc_attr( $value ) ) . "\n";
 	}, $group, $section );
 	// Yahoo credentials
 	$section = 'kgr-social-login-yahoo-credentials';
@@ -121,18 +121,18 @@ add_action( 'admin_init', function() {
 	// Yahoo Client ID
 	$name = 'kgr-social-login-yahoo-client-id';
 	register_setting( $group, $name );
-	add_settings_field( $name, sprintf( '<label for="%s">Client ID</label>', $name ), function() {
+	add_settings_field( $name, sprintf( '<label for="%s">%s</label>', esc_attr( $name ), esc_html( 'Client ID' ) ), function() {
 		$name = 'kgr-social-login-yahoo-client-id';
 		$value = get_option( $name, '' );
-		echo sprintf( '<input type="text" name="%s" id="%s" class="regular-text" placeholder="Client ID" autocomplete="off" value="%s" />', $name, $name, $value ) . "\n";
+		echo sprintf( '<input type="text" name="%s" id="%s" class="regular-text" placeholder="%s" autocomplete="off" value="%s" />', esc_attr( $name ), esc_attr( $name ), esc_attr( 'Client ID' ), esc_attr( $value ) ) . "\n";
 	}, $group, $section );
 	// Yahoo Client secret
 	$name = 'kgr-social-login-yahoo-client-secret';
 	register_setting( $group, $name );
-	add_settings_field( $name, sprintf( '<label for="%s">Client secret</label>', $name ), function() {
+	add_settings_field( $name, sprintf( '<label for="%s">%s</label>', esc_attr( $name ), esc_html( 'Client secret' ) ), function() {
 		$name = 'kgr-social-login-yahoo-client-secret';
 		$value = get_option( $name, '' );
-		echo sprintf( '<input type="text" name="%s" id="%s" class="regular-text" placeholder="Client secret" autocomplete="off" value="%s" />', $name, $name, $value ) . "\n";
+		echo sprintf( '<input type="text" name="%s" id="%s" class="regular-text" placeholder="%s" autocomplete="off" value="%s" />', esc_attr( $name ) , esc_attr( $name ), esc_attr( 'Client secret' ), esc_attr( $value ) ) . "\n";
 	}, $group, $section );
 } );
 
