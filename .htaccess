@@ -1,0 +1,6 @@
+Redirect 404 "/.git"
+Redirect 404 "/.gitignore"
+Redirect 404 "/README.md"
+Redirect 404 "/google"
+Redirect 404 "/microsoft"
+Redirect 404 "/yahoo"
