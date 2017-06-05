@@ -156,8 +156,12 @@ function kgr_social_login_settings_page() {
 	settings_fields( 'kgr-social-login' );
 	do_settings_sections( 'kgr-social-login' );
 	submit_button();
-	$url = admin_url( 'admin-ajax.php?action=kgr-social-login-clear' );
-	echo sprintf( '<p><a href="%s" class="button button-secondary" id="kgr-social-login-clear">%s</a></p>', $url, 'Clear' ) . "\n";
+	echo sprintf( '<h2>%s</h2>', esc_html( 'Clear' ) ) . "\n";
+	$name = 'kgr-social-login-clear';
+	$nonce = wp_create_nonce( $name );
+	$url = admin_url( sprintf( 'admin-ajax.php?action=%s&nonce=%s', $name, $nonce ) );
+	echo sprintf( '<p><a href="%s" class="button button-secondary kgr-social-login-button">%s</a></p>', esc_url( $url ), esc_html( 'Clear' ) ) . "\n";
+	echo sprintf( '<p class="description">%s</p>', esc_html( 'Delete all plugin options.' ) ) . "\n";
 	echo '</form>' . "\n";
 	echo '</div>' . "\n";
 }
@@ -172,7 +176,11 @@ add_action( 'admin_enqueue_scripts', function( string $hook ) {
 
 add_action( 'wp_ajax_kgr-social-login-clear', function() {
 	if ( !current_user_can( 'administrator' ) )
-		exit;
+		exit( 'role' );
+	$action = $_GET['action'];
+	$nonce = $_GET['nonce'];
+	if ( !wp_verify_nonce( $nonce, $action ) )
+		exit( 'nonce' );
 	foreach ( [ 'google', 'microsoft', 'yahoo' ] as $provider )
 		foreach ( [ 'client-id', 'client-secret' ] as $credential )
 			delete_option( sprintf( 'kgr-social-login-%s-%s', $provider, $credential ) );

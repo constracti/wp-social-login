@@ -1,10 +1,15 @@
 jQuery( document ).ready( function( $ ) {
 
-$( '#kgr-social-login-clear' ).click( function() {
-	if ( !confirm( 'Clear all credentials?' ) )
+$( '.kgr-social-login-button' ).click( function() {
+	var button = $( this );
+	var msg = button.parent().siblings( '.description' ).html();
+	if ( !confirm( msg ) )
 		return false;
-	$.get( $( this ).prop( 'href' ), function() {
-		location.href = '';
+	$.get( button.prop( 'href' ), function( data ) {
+		if ( data !== '' )
+			alert( data );
+		else
+			location.href = '';
 	} );
 	return false;
 } );
