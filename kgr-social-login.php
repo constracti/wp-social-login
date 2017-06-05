@@ -5,7 +5,7 @@
  * Plugin URI: https://github.com/constracti/wp-social-login
  * Description: Users can register or login with their google, microsoft or yahoo account.
  * Author: constracti
- * Version: 1.3.2
+ * Version: 1.4
  * License: GPL2
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  */
@@ -21,8 +21,11 @@ if ( !defined( 'ABSPATH' ) )
 	exit;
 
 require_once( plugin_dir_path( __FILE__ ) . 'settings.php' );
+require_once( plugin_dir_path( __FILE__ ) . 'widget.php' );
 
-function kgr_social_login_p( string $redirect_to ): string {
+function kgr_social_login_p( string $redirect_to = '' ): string {
+	if ( $redirect_to === '' )
+		$redirect_to = sprintf( '%s://%s%s', $_SERVER['REQUEST_SCHEME'], $_SERVER['SERVER_NAME'], $_SERVER['REQUEST_URI'] );
 	$html = '';
 	$html .= '<p class="kgr-social-login-p">' . "\n";
 	foreach ( [ 'google', 'microsoft', 'yahoo' ] as $provider ) {
