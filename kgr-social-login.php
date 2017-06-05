@@ -5,20 +5,17 @@
  * Plugin URI: https://github.com/constracti/wp-social-login
  * Description: Users can register or login with their google, microsoft or yahoo account.
  * Author: constracti
- * Version: 1.4.1
+ * Version: 1.4.2
  * License: GPL2
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  */
 
-/*
- * http://oauth2-client.thephpleague.com/
- * composer require league/oauth2-google
- * composer require stevenmaguire/oauth2-microsoft
- * composer require hayageek/oauth2-yahoo
- */
+// http://oauth2-client.thephpleague.com/
 
 if ( !defined( 'ABSPATH' ) )
 	exit;
+
+# TODO .htaccess hide files and directories
 
 define( 'KGR_SOCIAL_LOGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'KGR_SOCIAL_LOGIN_URL', plugin_dir_url( __FILE__ ) );
@@ -84,11 +81,11 @@ require_once( KGR_SOCIAL_LOGIN_DIR . 'settings.php' );
 require_once( KGR_SOCIAL_LOGIN_DIR . 'widget.php' );
 
 function kgr_social_login_p( string $redirect_to = '' ): string {
-	global $kgr_social_login_providers;
 	if ( $redirect_to === '' )
 		$redirect_to = sprintf( '%s://%s%s', $_SERVER['REQUEST_SCHEME'], $_SERVER['SERVER_NAME'], $_SERVER['REQUEST_URI'] );
 	$html = '';
 	$html .= '<p class="kgr-social-login-p">' . "\n";
+	global $kgr_social_login_providers;
 	foreach ( array_keys( $kgr_social_login_providers ) as $provider ) {
 		$flag = TRUE;
 		foreach ( [ 'client-id', 'client-secret' ] as $credential )

@@ -89,22 +89,39 @@ function kgr_social_login_settings_page() {
 		kgr_social_login_notice( 'info', 'info', 'Leave credentials empty to disable a social login option.' );
 		if ( intval( get_option( 'users_can_register' ) ) !== 1 )
 			kgr_social_login_notice( 'warning', 'warning', sprintf( 'New users can\'t register. Set option <a href="%s">here</a>.', admin_url( 'options-general.php' ) ) );
-	// Form
-	echo '<form method="post" action="options.php">' . "\n";
-	settings_fields( 'kgr-social-login' );
-	do_settings_sections( 'kgr-social-login' );
-	submit_button();
-	echo '</form>' . "\n";
-	// Clear
-	echo '<div>' . "\n";
-	echo sprintf( '<h2>%s</h2>', esc_html( 'Clear' ) ) . "\n";
-	$name = 'kgr-social-login-clear';
-	$nonce = wp_create_nonce( $name );
-	$url = admin_url( sprintf( 'admin-ajax.php?action=%s&nonce=%s', $name, $nonce ) );
-	echo sprintf( '<a href="%s" class="button button-secondary kgr-social-login-button">%s</a>', esc_url( $url ), esc_html( 'Clear' ) ) . "\n";
-	echo '<span class="spinner" style="float: none;"></span>' . "\n";
-	echo sprintf( '<p class="description">%s</p>', esc_html( 'Delete all plugin options.' ) ) . "\n";
-	echo '</div>' . "\n";
+	$flag = TRUE;
+	global $kgr_social_login_providers;
+	foreach ( array_keys( $kgr_social_login_providers ) as $provider )
+		$flag = $flag && file_exists( KGR_SOCIAL_LOGIN_DIR . $provider );
+	if ( !$flag ) {
+		// Install
+		echo '<div>' . "\n";
+		echo sprintf( '<h2>%s</h2>', esc_html( 'Install' ) ) . "\n";
+		$name = 'kgr-social-login-install';
+		$nonce = wp_create_nonce( $name );
+		$url = admin_url( sprintf( 'admin-ajax.php?action=%s&nonce=%s', $name, $nonce ) );
+		echo sprintf( '<a href="%s" class="button button-primary kgr-social-login-button">%s</a>', esc_url( $url ), esc_html( 'Install' ) ) . "\n";
+		echo '<span class="spinner" style="float: none;"></span>' . "\n";
+		echo sprintf( '<p class="description">%s</p>', esc_html( 'Install provider projects using composer.' ) ) . "\n";
+		echo '</div>' . "\n";
+	} else {
+		// Form
+		echo '<form method="post" action="options.php">' . "\n";
+		settings_fields( 'kgr-social-login' );
+		do_settings_sections( 'kgr-social-login' );
+		submit_button();
+		echo '</form>' . "\n";
+		// Clear
+		echo '<div>' . "\n";
+		echo sprintf( '<h2>%s</h2>', esc_html( 'Clear' ) ) . "\n";
+		$name = 'kgr-social-login-clear';
+		$nonce = wp_create_nonce( $name );
+		$url = admin_url( sprintf( 'admin-ajax.php?action=%s&nonce=%s', $name, $nonce ) );
+		echo sprintf( '<a href="%s" class="button button-secondary kgr-social-login-button">%s</a>', esc_url( $url ), esc_html( 'Clear' ) ) . "\n";
+		echo '<span class="spinner" style="float: none;"></span>' . "\n";
+		echo sprintf( '<p class="description">%s</p>', esc_html( 'Delete all plugin options.' ) ) . "\n";
+		echo '</div>' . "\n";
+	}
 	echo '</div>' . "\n";
 }
 
@@ -114,6 +131,35 @@ add_action( 'admin_enqueue_scripts', function( string $hook ) {
 	if ( $hook !== 'settings_page_kgr-social-login' )
 		return;
 	wp_enqueue_script( 'kgr-social-login-settings', KGR_SOCIAL_LOGIN_URL . 'settings.js', [ 'jquery' ] );
+} );
+
+add_action( 'wp_ajax_kgr-social-login-install', function() {
+	if ( !current_user_can( 'administrator' ) )
+		exit( 'role' );
+	$action = $_GET['action'];
+	$nonce = $_GET['nonce'];
+	if ( !wp_verify_nonce( $nonce, $action ) )
+		exit( 'nonce' );
+	$phar = KGR_SOCIAL_LOGIN_DIR . 'composer.phar';
+	putenv( 'COMPOSER_HOME=' . KGR_SOCIAL_LOGIN_DIR . '.composer' );
+	if ( !file_exists( $phar ) ) {
+		$file = KGR_SOCIAL_LOGIN_DIR . 'composer.php';
+		if ( !file_exists( $file ) ) {
+			$url = 'https://getcomposer.org/installer';
+			copy( $url, $file );
+			$command = implode( ' ', [ 'php', $file, '--install-dir', KGR_SOCIAL_LOGIN_DIR ] );
+			exec( $command );
+		}
+		unlink( $file );
+	}
+	global $kgr_social_login_providers;
+	foreach ( $kgr_social_login_providers as $provider => $provider_value ) {
+		mkdir( KGR_SOCIAL_LOGIN_DIR . $provider );
+		$command = implode( ' ', [ 'php', $phar, '--working-dir=' . KGR_SOCIAL_LOGIN_DIR . $provider, 'require', $provider_value['composer'] ] );
+		exec( $command );
+	}
+	unlink( $phar );
+	exit;
 } );
 
 add_action( 'wp_ajax_kgr-social-login-clear', function() {
