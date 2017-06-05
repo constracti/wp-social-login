@@ -43,97 +43,34 @@ add_action( 'admin_init', function() {
 </p>
 <?php
 	}, $group, $section );
-	// Google credentials
-	$section = 'kgr-social-login-google-credentials';
-	add_settings_section( $section, 'Google credentials', function() {
-		$redirect_url = admin_url( 'admin-ajax.php?action=kgr-social-login-google' );
-		echo '<a href="https://github.com/thephpleague/oauth2-google" target="_blank">github</a>' . "\n" .
-			'<span>|</span>' . "\n" .
-			'<a href="https://console.developers.google.com/" target="_blank">applications</a>' . "\n" .
-			'<span>|</span>' . "\n" .
-			'<a href="https://myaccount.google.com/permissions" target="_blank">permissions</a>' . "\n";
-		echo '<ol>' . "\n" .
-			'<li>Enable <i>Google+ API</i>.</li>' . "\n" .
-			'<li>Create <i>OAuth client ID</i> and choose type <i>Web application</i>.</li>' . "\n" .
-			sprintf( '<li>Add <code>%s</code> to <i>Authorized JavaScript origins</i>.</li>', home_url() ) . "\n" .
-			sprintf( '<li>Add <code>%s</code> to <i>Authorized redirect URIs</i>.</li>', $redirect_url ) . "\n" .
-			'</ol>' . "\n";
-	}, $group );
-	// Google Client ID
-	$name = 'kgr-social-login-google-client-id';
-	register_setting( $group, $name );
-	add_settings_field( $name, sprintf( '<label for="%s">%s</label>', esc_attr( $name ), esc_html( 'Client ID' ) ), function() {
-		$name = 'kgr-social-login-google-client-id';
-		$value = get_option( $name, '' );
-		echo sprintf( '<input type="text" name="%s" id="%s" class="regular-text" placeholder="%s" autocomplete="off" value="%s" />', esc_attr( $name ), esc_attr( $name ), esc_attr( 'Client ID' ), esc_attr( $value ) ) . "\n";
-	}, $group, $section );
-	// Google Client secret
-	$name = 'kgr-social-login-google-client-secret';
-	register_setting( $group, $name );
-	add_settings_field( $name, sprintf( '<label for="%s">%s</label>', esc_attr( $name ), esc_html( 'Client secret' ) ), function() {
-		$name = 'kgr-social-login-google-client-secret';
-		$value = get_option( $name, '' );
-		echo sprintf( '<input type="text" name="%s" id="%s" class="regular-text" placeholder="%s" autocomplete="off" value="%s" />', esc_attr( $name ) , esc_attr( $name ), esc_attr( 'Client secret' ), esc_attr( $value ) ) . "\n";
-	}, $group, $section );
-	// Microsoft credentials
-	$section = 'kgr-social-login-microsoft-credentials';
-	add_settings_section( $section, 'Microsoft credentials', function() {
-		$redirect_url = admin_url( 'admin-ajax.php' );
-		echo '<a href="https://github.com/stevenmaguire/oauth2-microsoft" target="_blank">github</a>' . "\n" .
-			'<span>|</span>' . "\n" .
-			'<a href="https://apps.dev.microsoft.com/" target="_blank">applications</a>' . "\n" .
-			'<span>|</span>' . "\n" .
-			'<a href="https://account.live.com/consent/Manage" target="_blank">permissions</a>' . "\n";
-		echo '<ol>' . "\n" .
-			'<li>Add a <i>Web</i> platform.</li>' . "\n" .
-			sprintf( '<li>Add <code>%s</code> to <i>Redirect URIs</i>.</li>', $redirect_url ) . "\n" .
-			'</ol>' . "\n";
-	}, $group );
-	// Microsoft Client ID
-	$name = 'kgr-social-login-microsoft-client-id';
-	register_setting( $group, $name );
-	add_settings_field( $name, sprintf( '<label for="%s">%s</label>', esc_attr( $name ), esc_html( 'Client ID' ) ), function() {
-		$name = 'kgr-social-login-microsoft-client-id';
-		$value = get_option( $name, '' );
-		echo sprintf( '<input type="text" name="%s" id="%s" class="regular-text" placeholder="%s" autocomplete="off" value="%s" />', esc_attr( $name ), esc_attr( $name ), esc_attr( 'Client ID' ), esc_attr( $value ) ) . "\n";
-	}, $group, $section );
-	// Microsoft Client secret
-	$name = 'kgr-social-login-microsoft-client-secret';
-	register_setting( $group, $name );
-	add_settings_field( $name, sprintf( '<label for="%s">%s</label>', esc_attr( $name ), esc_html( 'Client secret' ) ), function() {
-		$name = 'kgr-social-login-microsoft-client-secret';
-		$value = get_option( $name, '' );
-		echo sprintf( '<input type="text" name="%s" id="%s" class="regular-text" placeholder="%s" autocomplete="off" value="%s" />', esc_attr( $name ) , esc_attr( $name ), esc_attr( 'Client secret' ), esc_attr( $value ) ) . "\n";
-	}, $group, $section );
-	// Yahoo credentials
-	$section = 'kgr-social-login-yahoo-credentials';
-	add_settings_section( $section, 'Yahoo credentials', function() {
-		echo '<a href="https://github.com/hayageek/oauth2-yahoo" target="_blank">github</a>' . "\n" .
-			'<span>|</span>' . "\n" .
-			'<a href="https://developer.yahoo.com/apps/" target="_blank">applications</a>' . "\n" .
-			'<span>|</span>' . "\n" .
-			'<a href="https://login.yahoo.com/account/activity" target="_blank">permissions</a>' . "\n";
-		echo '<ol>' . "\n" .
-			'<li>Create a <i>Web Application</i>.</li>' . "\n" .
-			sprintf( '<li>Set <code>%s</code> as the <i>Callback Domain</i>.</li>', home_url() ) . "\n" .
-			'</ol>' . "\n";
-	}, $group );
-	// Yahoo Client ID
-	$name = 'kgr-social-login-yahoo-client-id';
-	register_setting( $group, $name );
-	add_settings_field( $name, sprintf( '<label for="%s">%s</label>', esc_attr( $name ), esc_html( 'Client ID' ) ), function() {
-		$name = 'kgr-social-login-yahoo-client-id';
-		$value = get_option( $name, '' );
-		echo sprintf( '<input type="text" name="%s" id="%s" class="regular-text" placeholder="%s" autocomplete="off" value="%s" />', esc_attr( $name ), esc_attr( $name ), esc_attr( 'Client ID' ), esc_attr( $value ) ) . "\n";
-	}, $group, $section );
-	// Yahoo Client secret
-	$name = 'kgr-social-login-yahoo-client-secret';
-	register_setting( $group, $name );
-	add_settings_field( $name, sprintf( '<label for="%s">%s</label>', esc_attr( $name ), esc_html( 'Client secret' ) ), function() {
-		$name = 'kgr-social-login-yahoo-client-secret';
-		$value = get_option( $name, '' );
-		echo sprintf( '<input type="text" name="%s" id="%s" class="regular-text" placeholder="%s" autocomplete="off" value="%s" />', esc_attr( $name ) , esc_attr( $name ), esc_attr( 'Client secret' ), esc_attr( $value ) ) . "\n";
-	}, $group, $section );
+	global $kgr_social_login_providers;
+	global $kgr_social_login_credentials;
+	foreach ( $kgr_social_login_providers as $provider => $provider_value ) {
+		$section = sprintf( 'kgr-social-login-%s-credentials', $provider );
+		add_settings_section( $section, $provider_value['label'], $provider_value['section'], $group );
+		foreach ( $kgr_social_login_credentials as $credential => $credential_value ) {
+			$name = sprintf( 'kgr-social-login-%s-%s', $provider, $credential );
+			register_setting( $group, $name );
+			add_settings_field(
+				$name,
+				sprintf( '<label for="%s">%s</label>', esc_attr( $name ), esc_html( $credential_value ) ),
+				function( array $args ) {
+					global $kgr_social_login_credentials;
+					$name = sprintf( 'kgr-social-login-%s-%s', $args['provider'], $args['credential'] );
+					$value = get_option( $name, '' );
+					echo sprintf( '<input type="text" name="%s" id="%s" class="regular-text" placeholder="%s" autocomplete="off" value="%s" />',
+						esc_attr( $name ),
+						esc_attr( $name ),
+						esc_attr( $kgr_social_login_credentials[ $args['credential'] ] ),
+						esc_attr( $value )
+					) . "\n";
+				},
+				$group,
+				$section,
+				[ 'provider' => $provider, 'credential' => $credential ]
+			);
+		}
+	}
 } );
 
 function kgr_social_login_notice( string $class, string $dashicon, string $message ) {
@@ -186,8 +123,10 @@ add_action( 'wp_ajax_kgr-social-login-clear', function() {
 	$nonce = $_GET['nonce'];
 	if ( !wp_verify_nonce( $nonce, $action ) )
 		exit( 'nonce' );
-	foreach ( [ 'google', 'microsoft', 'yahoo' ] as $provider )
-		foreach ( [ 'client-id', 'client-secret' ] as $credential )
+	global $kgr_social_login_providers;
+	global $kgr_social_login_credentials;
+	foreach ( array_keys( $kgr_social_login_providers ) as $provider )
+		foreach ( array_keys( $kgr_social_login_credentials ) as $credential )
 			delete_option( sprintf( 'kgr-social-login-%s-%s', $provider, $credential ) );
 	exit;
 } );

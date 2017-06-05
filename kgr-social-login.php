@@ -5,7 +5,7 @@
  * Plugin URI: https://github.com/constracti/wp-social-login
  * Description: Users can register or login with their google, microsoft or yahoo account.
  * Author: constracti
- * Version: 1.4
+ * Version: 1.4.1
  * License: GPL2
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  */
@@ -23,15 +23,73 @@ if ( !defined( 'ABSPATH' ) )
 define( 'KGR_SOCIAL_LOGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'KGR_SOCIAL_LOGIN_URL', plugin_dir_url( __FILE__ ) );
 
+$kgr_social_login_providers = [
+	'google' => [
+		'composer' => 'league/oauth2-google',
+		'label' => 'Google',
+		'section' => function() {
+			$redirect_url = admin_url( 'admin-ajax.php?action=kgr-social-login-google' );
+			echo '<a href="https://github.com/thephpleague/oauth2-google" target="_blank">github</a>' . "\n" .
+				'<span>|</span>' . "\n" .
+				'<a href="https://console.developers.google.com/" target="_blank">applications</a>' . "\n" .
+				'<span>|</span>' . "\n" .
+				'<a href="https://myaccount.google.com/permissions" target="_blank">permissions</a>' . "\n";
+			echo '<ol>' . "\n" .
+				'<li>Enable <i>Google+ API</i>.</li>' . "\n" .
+				'<li>Create <i>OAuth client ID</i> and choose type <i>Web application</i>.</li>' . "\n" .
+				sprintf( '<li>Add <code>%s</code> to <i>Authorized JavaScript origins</i>.</li>', home_url() ) . "\n" .
+				sprintf( '<li>Add <code>%s</code> to <i>Authorized redirect URIs</i>.</li>', $redirect_url ) . "\n" .
+				'</ol>' . "\n";
+		},
+	],
+	'microsoft' => [
+		'composer' => 'stevenmaguire/oauth2-microsoft',
+		'label' => 'Microsoft',
+		'section' => function() {
+			$redirect_url = admin_url( 'admin-ajax.php' );
+			echo '<a href="https://github.com/stevenmaguire/oauth2-microsoft" target="_blank">github</a>' . "\n" .
+				'<span>|</span>' . "\n" .
+				'<a href="https://apps.dev.microsoft.com/" target="_blank">applications</a>' . "\n" .
+				'<span>|</span>' . "\n" .
+				'<a href="https://account.live.com/consent/Manage" target="_blank">permissions</a>' . "\n";
+			echo '<ol>' . "\n" .
+				'<li>Add a <i>Web</i> platform.</li>' . "\n" .
+				sprintf( '<li>Add <code>%s</code> to <i>Redirect URIs</i>.</li>', $redirect_url ) . "\n" .
+				'</ol>' . "\n";
+		},
+	],
+	'yahoo' => [
+		'composer' => 'hayageek/oauth2-yahoo',
+		'label' => 'Yahoo',
+		'section' => function() {
+			echo '<a href="https://github.com/hayageek/oauth2-yahoo" target="_blank">github</a>' . "\n" .
+				'<span>|</span>' . "\n" .
+				'<a href="https://developer.yahoo.com/apps/" target="_blank">applications</a>' . "\n" .
+				'<span>|</span>' . "\n" .
+				'<a href="https://login.yahoo.com/account/activity" target="_blank">permissions</a>' . "\n";
+			echo '<ol>' . "\n" .
+				'<li>Create a <i>Web Application</i>.</li>' . "\n" .
+				sprintf( '<li>Set <code>%s</code> as the <i>Callback Domain</i>.</li>', home_url() ) . "\n" .
+				'</ol>' . "\n";
+		},
+	],
+];
+
+$kgr_social_login_credentials = [
+	'client-id' => 'Client ID',
+	'client-secret' => 'Client secret',
+];
+
 require_once( KGR_SOCIAL_LOGIN_DIR . 'settings.php' );
 require_once( KGR_SOCIAL_LOGIN_DIR . 'widget.php' );
 
 function kgr_social_login_p( string $redirect_to = '' ): string {
+	global $kgr_social_login_providers;
 	if ( $redirect_to === '' )
 		$redirect_to = sprintf( '%s://%s%s', $_SERVER['REQUEST_SCHEME'], $_SERVER['SERVER_NAME'], $_SERVER['REQUEST_URI'] );
 	$html = '';
 	$html .= '<p class="kgr-social-login-p">' . "\n";
-	foreach ( [ 'google', 'microsoft', 'yahoo' ] as $provider ) {
+	foreach ( array_keys( $kgr_social_login_providers ) as $provider ) {
 		$flag = TRUE;
 		foreach ( [ 'client-id', 'client-secret' ] as $credential )
 			$flag = $flag && get_option( sprintf( 'kgr-social-login-%s-%s', $provider, $credential ), '' ) !== '';
