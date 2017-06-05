@@ -2,14 +2,22 @@ jQuery( document ).ready( function( $ ) {
 
 $( '.kgr-social-login-button' ).click( function() {
 	var button = $( this );
-	var msg = button.parent().next( '.description' ).html();
-	if ( !confirm( msg ) )
+	if ( button.attr( 'disabled' ) )
 		return false;
-	$.get( button.prop( 'href' ), function( data ) {
+	var description = button.siblings( '.description' ).html();
+	if ( !confirm( description ) )
+		return false;
+	button.attr( 'disabled', true );
+	var spinner = button.siblings( '.spinner' );
+	spinner.addClass( 'is-active' );
+	$.get( button.prop( 'href' ) ).success( function( data ) {
 		if ( data !== '' )
-			alert( data );
+			console.log( data );
 		else
 			location.href = '';
+	} ).always( function() {
+		spinner.removeClass( 'is-active' );
+		button.attr( 'disabled', false );
 	} );
 	return false;
 } );

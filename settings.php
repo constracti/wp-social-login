@@ -149,20 +149,42 @@ function kgr_social_login_settings_page() {
 		return;
 	echo '<div class="wrap">' . "\n";
 	echo sprintf( '<h1>%s</h1>', 'KGR Social Login' ) . "\n";
-	kgr_social_login_notice( 'info', 'info', 'Leave credentials empty to disable a social login option.' );
-	if ( intval( get_option( 'users_can_register' ) ) !== 1 )
-		kgr_social_login_notice( 'warning', 'warning', sprintf( 'New users can\'t register. Set option <a href="%s">here</a>.', admin_url( 'options-general.php' ) ) );
-	echo '<form method="post" action="options.php">' . "\n";
-	settings_fields( 'kgr-social-login' );
-	do_settings_sections( 'kgr-social-login' );
-	submit_button();
-	echo sprintf( '<h2>%s</h2>', esc_html( 'Clear' ) ) . "\n";
-	$name = 'kgr-social-login-clear';
-	$nonce = wp_create_nonce( $name );
-	$url = admin_url( sprintf( 'admin-ajax.php?action=%s&nonce=%s', $name, $nonce ) );
-	echo sprintf( '<p><a href="%s" class="button button-secondary kgr-social-login-button">%s</a></p>', esc_url( $url ), esc_html( 'Clear' ) ) . "\n";
-	echo sprintf( '<p class="description">%s</p>', esc_html( 'Delete all plugin options.' ) ) . "\n";
-	echo '</form>' . "\n";
+	$flag = TRUE;
+	foreach ( [ 'google', 'microsoft', 'yahoo' ] as $provider ) {
+		$flag = $flag && file_exists( KGR_SOCIAL_LOGIN_DIR . $provider . '/composer.lock' );
+	}
+	if ( !$flag ) {
+		// Install
+		echo '<div>' . "\n";
+		echo sprintf( '<h2>%s</h2>', esc_html( 'Install' ) ) . "\n";
+		$name = 'kgr-social-login-install';
+		$nonce = wp_create_nonce( $name );
+		$url = admin_url( sprintf( 'admin-ajax.php?action=%s&nonce=%s', $name, $nonce ) );
+		echo sprintf( '<a href="%s" class="button button-primary kgr-social-login-button">%s</a>', esc_url( $url ), esc_html( 'Install' ) ) . "\n";
+		echo '<span class="spinner" style="float: none;"></span>' . "\n";
+		echo sprintf( '<p class="description">%s</p>', esc_html( 'Install provider projects using composer.' ) ) . "\n";
+		echo '</div>' . "\n";
+	} else {
+		kgr_social_login_notice( 'info', 'info', 'Leave credentials empty to disable a social login option.' );
+		if ( intval( get_option( 'users_can_register' ) ) !== 1 )
+			kgr_social_login_notice( 'warning', 'warning', sprintf( 'New users can\'t register. Set option <a href="%s">here</a>.', admin_url( 'options-general.php' ) ) );
+		// Main
+		echo '<form method="post" action="options.php">' . "\n";
+		settings_fields( 'kgr-social-login' );
+		do_settings_sections( 'kgr-social-login' );
+		submit_button();
+		echo '</form>' . "\n";
+		// Clear
+		echo '<div>' . "\n";
+		echo sprintf( '<h2>%s</h2>', esc_html( 'Clear' ) ) . "\n";
+		$name = 'kgr-social-login-clear';
+		$nonce = wp_create_nonce( $name );
+		$url = admin_url( sprintf( 'admin-ajax.php?action=%s&nonce=%s', $name, $nonce ) );
+		echo sprintf( '<a href="%s" class="button button-secondary kgr-social-login-button">%s</a>', esc_url( $url ), esc_html( 'Clear' ) ) . "\n";
+		echo '<span class="spinner" style="float: none;"></span>' . "\n";
+		echo sprintf( '<p class="description">%s</p>', esc_html( 'Delete all plugin options.' ) ) . "\n";
+		echo '</div>' . "\n";
+	}
 	echo '</div>' . "\n";
 }
 
@@ -171,7 +193,27 @@ add_action( 'admin_enqueue_scripts', function( string $hook ) {
 		return;
 	if ( $hook !== 'settings_page_kgr-social-login' )
 		return;
-	wp_enqueue_script( 'kgr-social-login-settings', plugins_url( 'settings.js', __FILE__ ), [ 'jquery' ] );
+	wp_enqueue_script( 'kgr-social-login-settings', KGR_SOCIAL_LOGIN_URL . 'settings.js', [ 'jquery' ] );
+} );
+
+add_action( 'wp_ajax_kgr-social-login-install', function() {
+	if ( !current_user_can( 'administrator' ) )
+		exit( 'role' );
+	$action = $_GET['action'];
+	$nonce = $_GET['nonce'];
+	if ( !wp_verify_nonce( $nonce, $action ) )
+		exit( 'nonce' );
+	putenv( 'COMPOSER_HOME=' . KGR_SOCIAL_LOGIN_DIR . '.composer' );
+	require 'Composer/autoload.php';
+	$app = new Composer\Console\Application();
+	$app->setAutoExit( FALSE );
+	$output = new Symfony\Component\Console\Output\NullOutput();
+	foreach ( [ 'google', 'microsoft', 'yahoo' ] as $provider ) {
+		$command = 'update --working-dir=' . KGR_SOCIAL_LOGIN_DIR . $provider;
+		$input = new Symfony\Component\Console\Input\StringInput( $command );
+		$app->run( $input, $output );
+	}
+	exit;
 } );
 
 add_action( 'wp_ajax_kgr-social-login-clear', function() {

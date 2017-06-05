@@ -20,8 +20,11 @@
 if ( !defined( 'ABSPATH' ) )
 	exit;
 
-require_once( plugin_dir_path( __FILE__ ) . 'settings.php' );
-require_once( plugin_dir_path( __FILE__ ) . 'widget.php' );
+define( 'KGR_SOCIAL_LOGIN_DIR', plugin_dir_path( __FILE__ ) );
+define( 'KGR_SOCIAL_LOGIN_URL', plugin_dir_url( __FILE__ ) );
+
+require_once( KGR_SOCIAL_LOGIN_DIR . 'settings.php' );
+require_once( KGR_SOCIAL_LOGIN_DIR . 'widget.php' );
 
 function kgr_social_login_p( string $redirect_to = '' ): string {
 	if ( $redirect_to === '' )
@@ -38,7 +41,7 @@ function kgr_social_login_p( string $redirect_to = '' ): string {
 			$provider,
 			urlencode( $redirect_to )
 		) );
-		$src = sprintf( '%s/%s.png', plugins_url( 'images' , __FILE__ ), $provider );
+		$src = sprintf( '%s/%s.png', KGR_SOCIAL_LOGIN_URL . 'images', $provider );
 		$html .= sprintf( '<a href="%s" title="%s">', esc_url( $href ), esc_attr( ucfirst( $provider ) ) ) . "\n";
 		$html .= sprintf( '<img src="%s" alt="%s" />', esc_url( $src ), esc_attr( $provider ) ) . "\n";
 		$html .= '</a>' . "\n";
@@ -58,12 +61,12 @@ add_shortcode( 'kgr-social-login', function( $atts ): string {
 } );
 
 add_action( 'wp_enqueue_scripts', function() {
-	wp_enqueue_style( 'kgr-social-login-buttons', plugins_url( 'buttons.css', __FILE__ ) );
+	wp_enqueue_style( 'kgr-social-login-buttons', KGR_SOCIAL_LOGIN_URL . 'buttons.css' );
 } );
 
 add_action( 'login_enqueue_scripts', function() {
-	wp_enqueue_style( 'kgr-social-login-buttons', plugins_url( 'buttons.css', __FILE__ ) );
-	wp_enqueue_script( 'kgr-social-login-form', plugins_url( 'form.js', __FILE__ ), [ 'jquery' ] );
+	wp_enqueue_style( 'kgr-social-login-buttons', KGR_SOCIAL_LOGIN_URL . 'buttons.css' );
+	wp_enqueue_script( 'kgr-social-login-form', KGR_SOCIAL_LOGIN_URL . 'form.js', [ 'jquery' ] );
 } );
 
 add_action( 'login_form', function() {
@@ -128,7 +131,7 @@ function kgr_social_login_callback( $provider, $scope ) {
 }
 
 add_action( 'wp_ajax_nopriv_kgr-social-login-google', function() {
-	require_once( plugin_dir_path( __FILE__ ) . 'google/vendor/autoload.php' );
+	require_once( KGR_SOCIAL_LOGIN_DIR . 'google/vendor/autoload.php' );
 	$provider = new League\OAuth2\Client\Provider\Google( [
 		'clientId'     => get_option( 'kgr-social-login-google-client-id' ),
 		'clientSecret' => get_option( 'kgr-social-login-google-client-secret' ),
@@ -138,7 +141,7 @@ add_action( 'wp_ajax_nopriv_kgr-social-login-google', function() {
 } );
 
 add_action( 'wp_ajax_nopriv_kgr-social-login-microsoft', function() {
-	require_once( plugin_dir_path( __FILE__ ) . 'microsoft/vendor/autoload.php' );
+	require_once( KGR_SOCIAL_LOGIN_DIR . 'microsoft/vendor/autoload.php' );
 	$provider = new Stevenmaguire\OAuth2\Client\Provider\Microsoft( [
 		'clientId'     => get_option( 'kgr-social-login-microsoft-client-id' ),
 		'clientSecret' => get_option( 'kgr-social-login-microsoft-client-secret' ),
@@ -148,7 +151,7 @@ add_action( 'wp_ajax_nopriv_kgr-social-login-microsoft', function() {
 } );
 
 add_action( 'wp_ajax_nopriv_kgr-social-login-yahoo', function() {
-	require_once( plugin_dir_path( __FILE__ ) . 'yahoo/vendor/autoload.php' );
+	require_once( KGR_SOCIAL_LOGIN_DIR . 'yahoo/vendor/autoload.php' );
 	$provider = new Hayageek\OAuth2\Client\Provider\Yahoo( [
 		'clientId'     => get_option( 'kgr-social-login-yahoo-client-id' ),
 		'clientSecret' => get_option( 'kgr-social-login-yahoo-client-secret' ),
