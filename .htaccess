@@ -1,4 +1,3 @@
-Redirect 404 "/.composer"
 Redirect 404 "/.git"
 Redirect 404 "/.gitignore"
 Redirect 404 "/google"

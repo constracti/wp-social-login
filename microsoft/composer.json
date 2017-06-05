@@ -1,5 +1,5 @@
 {
     "require": {
-        "stevenmaguire/oauth2-microsoft": "^2.0"
+        "stevenmaguire/oauth2-microsoft": "^2.1"
     }
 }
