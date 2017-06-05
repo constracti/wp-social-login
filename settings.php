@@ -147,9 +147,9 @@ add_action( 'wp_ajax_kgr-social-login-install', function() {
 		if ( !file_exists( $file ) ) {
 			$url = 'https://getcomposer.org/installer';
 			copy( $url, $file );
-			$command = implode( ' ', [ 'php', $file, '--install-dir', KGR_SOCIAL_LOGIN_DIR ] );
-			exec( $command );
 		}
+		$command = implode( ' ', [ 'php', $file, '--install-dir=' . KGR_SOCIAL_LOGIN_DIR, '--filename=composer.phar' ] );
+		exec( $command );
 		unlink( $file );
 	}
 	global $kgr_social_login_providers;
