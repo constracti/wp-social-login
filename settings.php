@@ -105,13 +105,13 @@ function kgr_social_login_settings_page() {
 	do_settings_sections( KGR_SOCIAL_LOGIN_KEY );
 	submit_button();
 	echo '</form>' . "\n";
-	// Clear
+	// Uninstall
 	echo '<div>' . "\n";
-	echo sprintf( '<h2>%s</h2>', esc_html( 'Clear' ) ) . "\n";
-	$name = 'kgr-social-login-clear';
+	echo sprintf( '<h2>%s</h2>', esc_html( 'Uninstall' ) ) . "\n";
+	$name = 'kgr-social-login-uninstall';
 	$nonce = wp_create_nonce( $name );
 	$url = admin_url( sprintf( 'admin-ajax.php?action=%s&nonce=%s', $name, $nonce ) );
-	echo sprintf( '<a href="%s" class="button button-secondary kgr-social-login-button">%s</a>', esc_url( $url ), esc_html( 'Clear' ) ) . "\n";
+	echo sprintf( '<a href="%s" class="button button-secondary kgr-social-login-button">%s</a>', esc_url( $url ), esc_html( 'Uninstall' ) ) . "\n";
 	echo '<span class="spinner" style="float: none;"></span>' . "\n";
 	echo sprintf( '<p class="description">%s</p>', esc_html( 'Delete all plugin options.' ) ) . "\n";
 	echo '</div>' . "\n";
@@ -126,7 +126,7 @@ add_action( 'admin_enqueue_scripts', function( string $hook ) {
 	wp_enqueue_script( 'kgr-social-login-settings', KGR_SOCIAL_LOGIN_URL . 'settings.js', [ 'jquery' ] );
 } );
 
-add_action( 'wp_ajax_kgr-social-login-clear', function() {
+add_action( 'wp_ajax_kgr-social-login-uninstall', function() {
 	if ( !current_user_can( 'administrator' ) )
 		exit( 'role' );
 	$action = $_GET['action'];
