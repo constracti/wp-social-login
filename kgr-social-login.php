@@ -10,15 +10,16 @@
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  */
 
-// http://oauth2-client.thephpleague.com/
+# http://oauth2-client.thephpleague.com/
 
 if ( !defined( 'ABSPATH' ) )
 	exit;
 
-# TODO .htaccess hide files and directories
+# TODO remove subdirectories from origins
 
 define( 'KGR_SOCIAL_LOGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'KGR_SOCIAL_LOGIN_URL', plugin_dir_url( __FILE__ ) );
+define( 'KGR_SOCIAL_LOGIN_KEY', 'kgr-social-login' );
 
 $kgr_social_login_providers = [
 	'google' => [
@@ -80,26 +81,26 @@ $kgr_social_login_credentials = [
 require_once( KGR_SOCIAL_LOGIN_DIR . 'settings.php' );
 require_once( KGR_SOCIAL_LOGIN_DIR . 'widget.php' );
 
-function kgr_social_login_p( string $redirect_to = '' ): string {
-	if ( $redirect_to === '' )
-		$redirect_to = sprintf( '%s://%s%s',
-			$_SERVER['HTTPS'] === 'on' ? 'https' : 'http',
-			$_SERVER['SERVER_NAME'],
-			$_SERVER['REQUEST_URI']
-		);
+add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), function( array $links ): array {
+	$links[] = sprintf( '<a href="%s">%s</a>', menu_page_url( KGR_SOCIAL_LOGIN_KEY, FALSE ), esc_html__( 'Settings' ) );
+	return $links;
+} );
+
+function kgr_social_login_p(): string {
 	$html = '';
-	$html .= '<p class="kgr-social-login-p">' . "\n";
+	$html .= '<p class="kgr-social-login">' . "\n";
 	global $kgr_social_login_providers;
 	foreach ( array_keys( $kgr_social_login_providers ) as $provider ) {
+		$name = sprintf( '%s-%s-composer', KGR_SOCIAL_LOGIN_KEY, $provider );
+		$value = get_option( $name, '' );
+		if ( $value === '' || !file_exists( $value ) )
+			continue;
 		$flag = TRUE;
 		foreach ( [ 'client-id', 'client-secret' ] as $credential )
-			$flag = $flag && get_option( sprintf( 'kgr-social-login-%s-%s', $provider, $credential ), '' ) !== '';
+			$flag = $flag && get_option( sprintf( '%s-%s-%s', KGR_SOCIAL_LOGIN_KEY, $provider, $credential ), '' ) !== '';
 		if ( !$flag )
 			continue;
-		$href = admin_url( sprintf( 'admin-ajax.php?action=kgr-social-login-%s&redirect_to=%s&login',
-			$provider,
-			urlencode( $redirect_to )
-		) );
+		$href = admin_url( sprintf( 'admin-ajax.php?action=%s-%s&login', KGR_SOCIAL_LOGIN_KEY, $provider ) );
 		$src = sprintf( '%s/%s.png', KGR_SOCIAL_LOGIN_URL . 'images', $provider );
 		$html .= sprintf( '<a href="%s" title="%s">', esc_url( $href ), esc_attr( ucfirst( $provider ) ) ) . "\n";
 		$html .= sprintf( '<img src="%s" alt="%s" />', esc_url( $src ), esc_attr( $provider ) ) . "\n";
@@ -109,33 +110,30 @@ function kgr_social_login_p( string $redirect_to = '' ): string {
 	return $html;
 }
 
-add_shortcode( 'kgr-social-login', function( $atts ): string {
+add_shortcode( KGR_SOCIAL_LOGIN_KEY, function( $atts ): string {
 	if ( is_user_logged_in() )
 		return '';
 	$html = '';
-	if ( array_key_exists( 'prompt', $atts ) )
-		$html .= sprintf( '<p>%s</p>', esc_html( $atts['prompt'] ) ) . "\n";
-	$html .= kgr_social_login_p( get_permalink() );
+	$html .= sprintf( '<p><a href="%s">%s</a></p>', esc_url( wp_login_url() ), esc_html__( 'Log in' ) ) . "\n";
+	$html .= kgr_social_login_p();
 	return $html;
 } );
 
 add_action( 'wp_enqueue_scripts', function() {
-	wp_enqueue_style( 'kgr-social-login-buttons', KGR_SOCIAL_LOGIN_URL . 'buttons.css' );
+	wp_enqueue_style( 'kgr-social-login-buttons', KGR_SOCIAL_LOGIN_URL . 'buttons.css', [], NULL );
 } );
 
 add_action( 'login_enqueue_scripts', function() {
-	wp_enqueue_style( 'kgr-social-login-buttons', KGR_SOCIAL_LOGIN_URL . 'buttons.css' );
-	wp_enqueue_script( 'kgr-social-login-form', KGR_SOCIAL_LOGIN_URL . 'form.js', [ 'jquery' ] );
+	wp_enqueue_style( 'kgr-social-login-buttons', KGR_SOCIAL_LOGIN_URL . 'buttons.css', [], NULL );
+	wp_enqueue_script( 'kgr-social-login-form', KGR_SOCIAL_LOGIN_URL . 'form.js', [ 'jquery' ], NULL );
 } );
 
 add_action( 'login_form', function() {
-	$redirect_to = array_key_exists( 'redirect_to', $_GET ) ? $_GET['redirect_to'] : home_url();
-	echo kgr_social_login_p( $redirect_to );
+	echo kgr_social_login_p();
 } );
 
 add_action( 'register_form', function() {
-	$redirect_to = array_key_exists( 'redirect_to', $_GET ) ? $_GET['redirect_to'] : admin_url();
-	echo kgr_social_login_p( $redirect_to );
+	echo kgr_social_login_p();
 } );
 
 function kgr_social_login_error( string $error ) {
@@ -145,17 +143,12 @@ function kgr_social_login_error( string $error ) {
 
 function kgr_social_login_callback( $provider, $scope ) {
 	if ( array_key_exists( 'login', $_GET ) ) {
-		if ( !array_key_exists( 'redirect_to', $_GET ) )
-			kgr_social_login_error( 'redirection not set' );
 		$options = [
 			'scope' => $scope,
-			'state' => urlencode( $_GET['redirect_to'] ),
 		];
 		header( 'location: ' . $provider->getAuthorizationUrl( $options ) );
 		exit;
 	} elseif ( array_key_exists( 'code', $_GET ) ) {
-		if ( !array_key_exists( 'state', $_GET ) )
-			kgr_social_login_error( 'state parameter not set' );
 		$token = $provider->getAccessToken( 'authorization_code', ['code' => $_GET['code']] );
 		$owner = $provider->getResourceOwner( $token );
 		$email = $owner->getEmail();
@@ -180,7 +173,7 @@ function kgr_social_login_callback( $provider, $scope ) {
 		}
 		$remember = get_option( 'kgr-social-login-remember', '' ) === 'on';
 		wp_set_auth_cookie( $user_id, $remember );
-		header( 'location: ' . urldecode( $_GET['state'] ) );
+		header( 'location: ' . home_url() );
 		exit;
 	} elseif ( array_key_exists( 'error', $_GET ) ) {
 		kgr_social_login_error( sprintf( 'authentication %s', $_GET['error'] ) );
@@ -190,7 +183,9 @@ function kgr_social_login_callback( $provider, $scope ) {
 }
 
 add_action( 'wp_ajax_nopriv_kgr-social-login-google', function() {
-	require_once( KGR_SOCIAL_LOGIN_DIR . 'google/vendor/autoload.php' );
+	$name = sprintf( '%s-%s-composer', KGR_SOCIAL_LOGIN_KEY, 'google' );
+	$value = get_option( $name, '' );
+	require_once( $value . '/vendor/autoload.php' );
 	$provider = new League\OAuth2\Client\Provider\Google( [
 		'clientId'     => get_option( 'kgr-social-login-google-client-id' ),
 		'clientSecret' => get_option( 'kgr-social-login-google-client-secret' ),
@@ -200,7 +195,9 @@ add_action( 'wp_ajax_nopriv_kgr-social-login-google', function() {
 } );
 
 add_action( 'wp_ajax_nopriv_kgr-social-login-microsoft', function() {
-	require_once( KGR_SOCIAL_LOGIN_DIR . 'microsoft/vendor/autoload.php' );
+	$name = sprintf( '%s-%s-composer', KGR_SOCIAL_LOGIN_KEY, 'microsoft' );
+	$value = get_option( $name, '' );
+	require_once( $value . '/vendor/autoload.php' );
 	$provider = new Stevenmaguire\OAuth2\Client\Provider\Microsoft( [
 		'clientId'     => get_option( 'kgr-social-login-microsoft-client-id' ),
 		'clientSecret' => get_option( 'kgr-social-login-microsoft-client-secret' ),
@@ -210,7 +207,9 @@ add_action( 'wp_ajax_nopriv_kgr-social-login-microsoft', function() {
 } );
 
 add_action( 'wp_ajax_nopriv_kgr-social-login-yahoo', function() {
-	require_once( KGR_SOCIAL_LOGIN_DIR . 'yahoo/vendor/autoload.php' );
+	$name = sprintf( '%s-%s-composer', KGR_SOCIAL_LOGIN_KEY, 'yahoo' );
+	$value = get_option( $name, '' );
+	require_once( $value . '/vendor/autoload.php' );
 	$provider = new Hayageek\OAuth2\Client\Provider\Yahoo( [
 		'clientId'     => get_option( 'kgr-social-login-yahoo-client-id' ),
 		'clientSecret' => get_option( 'kgr-social-login-yahoo-client-secret' ),

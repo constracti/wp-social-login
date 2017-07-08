@@ -8,9 +8,9 @@ class KGR_Social_Login_Widget extends WP_Widget {
 	function __construct() {
 		$widget_ops = [
 			'classname' => 'kgr-social-login-widget',
-			'description' => 'Display social login options.',
+			'description' => esc_html( 'Display social login options.' ),
 		];
-		parent::__construct( FALSE, 'KGR Social Login', $widget_ops );
+		parent::__construct( FALSE, esc_html( 'KGR Social Login' ), $widget_ops );
 	}
 
 	function settings(): array {
@@ -27,7 +27,11 @@ class KGR_Social_Login_Widget extends WP_Widget {
 			'field' => function( string $id, string $name, string $value, string $label ) {
 				echo '<p>' . "\n";
 				echo sprintf( '<label for="%s">%s</label>', $id, esc_html( $label ) ) . "\n";
-				echo sprintf( '<input class="widefat" id="%s" name="%s" type="text" value="%s" />', $id, $name, esc_attr( $value ) ) . "\n";
+				echo sprintf( '<input class="widefat" id="%s" name="%s" type="text" value="%s" />',
+					esc_attr( $id ),
+					esc_attr( $name ),
+					esc_attr( $value )
+				) . "\n";
 				echo '</p>' . "\n";
 			},
 		];
