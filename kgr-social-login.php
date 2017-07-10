@@ -5,7 +5,7 @@
  * Plugin URI: https://github.com/constracti/wp-social-login
  * Description: Users can register or login with their google, microsoft or yahoo account.
  * Author: constracti
- * Version: 1.4.4
+ * Version: 1.5
  * License: GPL2
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  */
