@@ -149,10 +149,6 @@ function kgr_social_login_callback( $provider, $scope ) {
 		header( 'location: ' . $provider->getAuthorizationUrl( $options ) );
 		exit;
 	} elseif ( array_key_exists( 'code', $_GET ) ) {
-		$http_client = new GuzzleHttp\Client( [
-			'verify' => KGR_SOCIAL_LOGIN_DIR . 'cacert.pem',
-		] );
-		$provider->setHttpClient( $http_client );
 		$token = $provider->getAccessToken( 'authorization_code', ['code' => $_GET['code']] );
 		$owner = $provider->getResourceOwner( $token );
 		$email = $owner->getEmail();
