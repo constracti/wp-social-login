@@ -5,7 +5,7 @@
  * Plugin URI: https://github.com/constracti/wp-social-login
  * Description: Users can register or login with their google, microsoft or yahoo account.
  * Author: constracti
- * Version: 1.5.2
+ * Version: 1.5.3
  * License: GPL2
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  */
@@ -151,7 +151,9 @@ function kgr_social_login_callback( $provider, $scope ) {
 	} elseif ( array_key_exists( 'code', $_GET ) ) {
 		$token = $provider->getAccessToken( 'authorization_code', ['code' => $_GET['code']] );
 		$owner = $provider->getResourceOwner( $token );
-		$email = $owner->getEmail();
+		$email = filter_var( $owner->getEmail(), FILTER_VALIDATE_EMAIL );
+		if ( $email === FALSE )
+			kgr_social_login_error( 'provider responded with an invalid email address' );
 		$user = get_user_by( 'email', $email );
 		if ( $user !== FALSE ) {
 			$user_id = $user->ID;
@@ -168,6 +170,8 @@ function kgr_social_login_callback( $provider, $scope ) {
 				}
 			} while ( username_exists( $login ) );
 			$user_id = register_new_user( $login, $email );
+			if ( is_wp_error( $user_id ) )
+				kgr_social_login_error( 'error during user registration' );
 		} else {
 			kgr_social_login_error( 'new users can\'t register' );
 		}
