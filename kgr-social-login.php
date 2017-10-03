@@ -5,7 +5,7 @@
  * Plugin URI: https://github.com/constracti/wp-social-login
  * Description: Users can register or login with their google, microsoft or yahoo account.
  * Author: constracti
- * Version: 1.5.4
+ * Version: 1.5.5
  * License: GPL2
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  */
@@ -149,7 +149,7 @@ function kgr_social_login_callback( $provider, $scope ) {
 		header( 'location: ' . $provider->getAuthorizationUrl( $options ) );
 		exit;
 	} elseif ( array_key_exists( 'code', $_GET ) ) {
-		if ( is_null( ini_get( 'curl.cainfo' ) ) ) {
+		if ( ini_get( 'curl.cainfo' ) === '' ) {
 			$http_client = new GuzzleHttp\Client( [
 				'verify' => KGR_SOCIAL_LOGIN_DIR . 'cacert.pem',
 			] );
