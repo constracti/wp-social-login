@@ -17,6 +17,8 @@ if ( !defined( 'ABSPATH' ) )
 
 # TODO remove subdirectories from origins
 
+# TODO redirect
+
 define( 'KGR_SOCIAL_LOGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'KGR_SOCIAL_LOGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'KGR_SOCIAL_LOGIN_KEY', 'kgr-social-login' );
@@ -176,11 +178,11 @@ function kgr_social_login_callback( $provider, $scope ) {
 				}
 			} while ( username_exists( $login ) );
 			# temporarily disable google-captcha plugin action
-			if ( is_callable( 'gglcptch_lostpassword_check' ) )
-				remove_action( 'registration_errors', 'gglcptch_lostpassword_check' );
+			if ( is_callable( 'gglcptch_register_check' ) )
+				remove_action( 'registration_errors', 'gglcptch_register_check' );
 			$user_id = register_new_user( $login, $email );
-			if ( is_callable( 'gglcptch_lostpassword_check' ) )
-				add_action( 'registration_errors', 'gglcptch_lostpassword_check' );
+			if ( is_callable( 'gglcptch_register_check' ) )
+				add_action( 'registration_errors', 'gglcptch_register_check' );
 			if ( is_wp_error( $user_id ) )
 				kgr_social_login_error( 'error during user registration' );
 		} else {
