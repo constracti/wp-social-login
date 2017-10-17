@@ -54,11 +54,12 @@ class KGR_Social_Login_Widget extends WP_Widget {
 	}
 
 	function content( array $instance ) {
+		$redirect = kgr_social_login_default_redirect();
 		if ( !is_user_logged_in() ) {
-			echo sprintf( '<p><a href="%s">%s</a></p>', esc_url( wp_login_url() ), esc_html__( 'Log in' ) ) . "\n";
+			echo sprintf( '<p><a href="%s">%s</a></p>', esc_url( wp_login_url( $redirect ) ), esc_html__( 'Log in' ) ) . "\n";
 			echo kgr_social_login_p();
 		} else {
-			echo sprintf( '<p><a href="%s">%s</a></p>', esc_url( wp_logout_url() ), esc_html__( 'Log out' ) ) . "\n";
+			echo sprintf( '<p><a href="%s">%s</a></p>', esc_url( wp_logout_url( $redirect ) ), esc_html__( 'Log out' ) ) . "\n";
 		}
 	}
 

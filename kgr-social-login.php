@@ -5,7 +5,7 @@
  * Plugin URI: https://github.com/constracti/wp-social-login
  * Description: Users can register or login with their google, microsoft or yahoo account.
  * Author: constracti
- * Version: 1.5.6
+ * Version: 1.6
  * License: GPL2
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  */
@@ -16,8 +16,6 @@ if ( !defined( 'ABSPATH' ) )
 	exit;
 
 # TODO remove subdirectories from origins
-
-# TODO redirect
 
 define( 'KGR_SOCIAL_LOGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'KGR_SOCIAL_LOGIN_URL', plugin_dir_url( __FILE__ ) );
@@ -88,7 +86,18 @@ add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), function( arra
 	return $links;
 } );
 
-function kgr_social_login_p(): string {
+function kgr_social_login_default_redirect(): string {
+	return sprintf( '%s://%s%s',
+		$_SERVER['REQUEST_SCHEME'],
+		$_SERVER['SERVER_NAME'],
+		$_SERVER['REQUEST_URI']
+	);
+}
+
+function kgr_social_login_p( string $redirect = '' ): string {
+	if ( $redirect === '' )
+		$redirect = kgr_social_login_default_redirect();
+	$redirect = urlencode( $redirect );
 	$html = '';
 	$html .= '<p class="kgr-social-login">' . "\n";
 	global $kgr_social_login_providers;
@@ -102,7 +111,7 @@ function kgr_social_login_p(): string {
 			$flag = $flag && get_option( sprintf( '%s-%s-%s', KGR_SOCIAL_LOGIN_KEY, $provider, $credential ), '' ) !== '';
 		if ( !$flag )
 			continue;
-		$href = admin_url( sprintf( 'admin-ajax.php?action=%s-%s&login', KGR_SOCIAL_LOGIN_KEY, $provider ) );
+		$href = admin_url( sprintf( 'admin-ajax.php?action=%s-%s&redirect_to=%s', KGR_SOCIAL_LOGIN_KEY, $provider, $redirect ) );
 		$src = sprintf( '%s/%s.png', KGR_SOCIAL_LOGIN_URL . 'images', $provider );
 		$html .= sprintf( '<a href="%s" title="%s">', esc_url( $href ), esc_attr( ucfirst( $provider ) ) ) . "\n";
 		$html .= sprintf( '<img src="%s" alt="%s" />', esc_url( $src ), esc_attr( $provider ) ) . "\n";
@@ -130,13 +139,15 @@ add_action( 'login_enqueue_scripts', function() {
 	wp_enqueue_script( 'kgr-social-login-form', KGR_SOCIAL_LOGIN_URL . 'form.js', [ 'jquery' ], NULL );
 } );
 
-add_action( 'login_form', function() {
-	echo kgr_social_login_p();
-} );
-
-add_action( 'register_form', function() {
-	echo kgr_social_login_p();
-} );
+function kgr_social_login_form() {
+	if ( array_key_exists( 'redirect_to', $_GET ) )
+		$redirect = $_GET['redirect_to'];
+	else
+		$redirect = admin_url();
+	echo kgr_social_login_p( $redirect );
+}
+add_action( 'login_form', 'kgr_social_login_form' );
+add_action( 'register_form', 'kgr_social_login_form' );
 
 function kgr_social_login_error( string $error ) {
 	$function = apply_filters( 'wp_die_handler', '_default_wp_die_handler' );
@@ -144,13 +155,7 @@ function kgr_social_login_error( string $error ) {
 }
 
 function kgr_social_login_callback( $provider, $scope ) {
-	if ( array_key_exists( 'login', $_GET ) ) {
-		$options = [
-			'scope' => $scope,
-		];
-		header( 'location: ' . $provider->getAuthorizationUrl( $options ) );
-		exit;
-	} elseif ( array_key_exists( 'code', $_GET ) ) {
+	if ( array_key_exists( 'code', $_GET ) ) {
 		if ( ini_get( 'curl.cainfo' ) === '' ) {
 			$http_client = new GuzzleHttp\Client( [
 				'verify' => KGR_SOCIAL_LOGIN_DIR . 'cacert.pem',
@@ -190,12 +195,21 @@ function kgr_social_login_callback( $provider, $scope ) {
 		}
 		$remember = get_option( 'kgr-social-login-remember', '' ) === 'on';
 		wp_set_auth_cookie( $user_id, $remember );
-		header( 'location: ' . home_url() );
+		if ( array_key_exists( 'state', $_GET ) )
+			$url = $_GET['state'];
+		else
+			$url = admin_url();
+		header( 'location: ' . $url );
 		exit;
 	} elseif ( array_key_exists( 'error', $_GET ) ) {
 		kgr_social_login_error( sprintf( 'authentication %s', $_GET['error'] ) );
 	} else {
-		kgr_social_login_error( 'invalid function invocation' );
+		$options = [];
+		$options['scope'] = $scope;
+		if ( array_key_exists( 'redirect_to', $_GET ) )
+			$options['state'] = $_GET['redirect_to'];
+		header( 'location: ' . $provider->getAuthorizationUrl( $options ) );
+		exit;
 	}
 }
 
