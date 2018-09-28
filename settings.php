@@ -45,7 +45,7 @@ add_action( 'admin_init', function() {
 		add_settings_section( $section, $provider_value['label'], $provider_value['section'], $group );
 		$name = sprintf( '%s-%s-composer', KGR_SOCIAL_LOGIN_KEY, $provider );
 		register_setting( $group, $name );
-		add_settings_field( $name, sprintf( '<label for="%s">%s</label>', esc_attr( $name ), esc_html( 'Composer directory' ) ), function( array $args ) {
+		add_settings_field( $name, sprintf( '<label for="%s">%s</label>', esc_attr( $name ), esc_html( 'Composer directory' ) ), function( $args ) {
 			$name = sprintf( '%s-%s-composer', KGR_SOCIAL_LOGIN_KEY, $args['provider'] );
 			$value = get_option( $name, '' );
 			echo sprintf( '<input type="text" name="%s" id="%s" class="regular-text" placeholder="%s" autocomplete="off" value="%s" />',
@@ -64,7 +64,7 @@ add_action( 'admin_init', function() {
 			add_settings_field(
 				$name,
 				sprintf( '<label for="%s">%s</label>', esc_attr( $name ), esc_html( $credential_value ) ),
-				function( array $args ) {
+				function( $args ) {
 					global $kgr_social_login_credentials;
 					$name = sprintf( 'kgr-social-login-%s-%s', $args['provider'], $args['credential'] );
 					$value = get_option( $name, '' );
@@ -83,7 +83,7 @@ add_action( 'admin_init', function() {
 	}
 } );
 
-function kgr_social_login_notice( string $class, string $dashicon, string $message ) {
+function kgr_social_login_notice( $class, $dashicon, $message ) {
 ?>
 <div class="notice notice-<?= $class ?>">
 	<p class="dashicons-before dashicons-<?= $dashicon ?>"><?= $message ?></p>
@@ -118,7 +118,7 @@ function kgr_social_login_settings_page() {
 	echo '</div>' . "\n";
 }
 
-add_action( 'admin_enqueue_scripts', function( string $hook ) {
+add_action( 'admin_enqueue_scripts', function( $hook ) {
 	if ( !current_user_can( 'administrator' ) )
 		return;
 	if ( $hook !== 'settings_page_kgr-social-login' )

@@ -5,7 +5,7 @@
  * Plugin URI: https://github.com/constracti/wp-social-login
  * Description: Users can register or login with their google, microsoft or yahoo account.
  * Author: constracti
- * Version: 1.6.1
+ * Version: 1.6.2
  * License: GPL2
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  */
@@ -81,12 +81,12 @@ $kgr_social_login_credentials = [
 require_once( KGR_SOCIAL_LOGIN_DIR . 'settings.php' );
 require_once( KGR_SOCIAL_LOGIN_DIR . 'widget.php' );
 
-add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), function( array $links ): array {
+add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), function( $links ) {
 	$links[] = sprintf( '<a href="%s">%s</a>', menu_page_url( KGR_SOCIAL_LOGIN_KEY, FALSE ), esc_html__( 'Settings' ) );
 	return $links;
 } );
 
-function kgr_social_login_default_redirect(): string {
+function kgr_social_login_default_redirect() {
 	return sprintf( '%s://%s%s',
 		$_SERVER['REQUEST_SCHEME'],
 		$_SERVER['SERVER_NAME'],
@@ -94,7 +94,7 @@ function kgr_social_login_default_redirect(): string {
 	);
 }
 
-function kgr_social_login_p( string $redirect = '' ): string {
+function kgr_social_login_p( $redirect = '' ) {
 	if ( $redirect === '' )
 		$redirect = kgr_social_login_default_redirect();
 	$redirect = urlencode( $redirect );
@@ -121,7 +121,7 @@ function kgr_social_login_p( string $redirect = '' ): string {
 	return $html;
 }
 
-add_shortcode( KGR_SOCIAL_LOGIN_KEY, function( $atts ): string {
+add_shortcode( KGR_SOCIAL_LOGIN_KEY, function( $atts ) {
 	if ( is_user_logged_in() )
 		return '';
 	$redirect = kgr_social_login_default_redirect();
@@ -150,7 +150,7 @@ function kgr_social_login_form() {
 add_action( 'login_form', 'kgr_social_login_form' );
 add_action( 'register_form', 'kgr_social_login_form' );
 
-function kgr_social_login_error( string $error ) {
+function kgr_social_login_error( $error ) {
 	$function = apply_filters( 'wp_die_handler', '_default_wp_die_handler' );
 	call_user_func( $function, $error, 'Error', [ 'back_link' => TRUE ] );
 }
@@ -183,7 +183,7 @@ function kgr_social_login_callback( $provider, $scope ) {
 					$cnt++;
 				}
 			} while ( username_exists( $login ) );
-			# temporarily disable google-captcha plugin action
+			# temporarily disable Google Captcha (reCAPTCHA) by BestWebSoft plugin action
 			if ( is_callable( 'gglcptch_register_check' ) )
 				remove_action( 'registration_errors', 'gglcptch_register_check' );
 			$user_id = register_new_user( $login, $email );

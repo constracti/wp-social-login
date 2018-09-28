@@ -13,18 +13,18 @@ class KGR_Social_Login_Widget extends WP_Widget {
 		parent::__construct( FALSE, esc_html( 'KGR Social Login' ), $widget_ops );
 	}
 
-	function settings(): array {
+	function settings() {
 		$settings = [];
 		$settings['title'] = $this->settings_text( 'title' );
 		return $settings;
 	}
 
-	function settings_text( string $label ): array {
+	function settings_text( $label ) {
 		return [
 			'default' => '',
 			'sanitize' => 'strval',
 			'label' => $label,
-			'field' => function( string $id, string $name, string $value, string $label ) {
+			'field' => function( $id, $name, $value, $label ) {
 				echo '<p>' . "\n";
 				echo sprintf( '<label for="%s">%s</label>', $id, esc_html( $label ) ) . "\n";
 				echo sprintf( '<input class="widefat" id="%s" name="%s" type="text" value="%s" />',
@@ -37,7 +37,7 @@ class KGR_Social_Login_Widget extends WP_Widget {
 		];
 	}
 
-	function instance( $instance = NULL ): array {
+	function instance( $instance = NULL ) {
 		$settings = $this->settings();
 		if ( is_null( $instance ) || !is_array( $instance ) )
 			$instance = [];
@@ -47,13 +47,13 @@ class KGR_Social_Login_Widget extends WP_Widget {
 		return $instance;
 	}
 
-	function title( array $args, array $instance ) {
+	function title( $args, $instance ) {
 		if ( $instance['title'] === '' )
 			return;
 		echo $args['before_title'] . esc_html( $instance['title'] ) . $args['after_title'] . "\n";
 	}
 
-	function content( array $instance ) {
+	function content( $instance ) {
 		$redirect = kgr_social_login_default_redirect();
 		if ( !is_user_logged_in() ) {
 			echo sprintf( '<p><a href="%s">%s</a></p>', esc_url( wp_login_url( $redirect ) ), esc_html__( 'Log in' ) ) . "\n";
@@ -72,7 +72,7 @@ class KGR_Social_Login_Widget extends WP_Widget {
 		}
 	}
 
-	function update( $new_instance, $old_instance ): array {
+	function update( $new_instance, $old_instance ) {
 		$instance = [];
 		foreach ( $this->settings() as $key => $value )
 			if ( array_key_exists( $key, $new_instance ) )
