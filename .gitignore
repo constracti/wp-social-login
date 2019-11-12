@@ -1,1 +1,4 @@
 cacert.pem
+.gitignore
+kgr-social-login.zip
+release.sh

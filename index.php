@@ -5,7 +5,7 @@
  * Plugin URI: https://github.com/constracti/wp-social-login
  * Description: Users can register or login with their google, microsoft or yahoo account.
  * Author: constracti
- * Version: 1.6.2
+ * Version: 1.6.3
  * License: GPL2
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  */
@@ -183,12 +183,8 @@ function kgr_social_login_callback( $provider, $scope ) {
 					$cnt++;
 				}
 			} while ( username_exists( $login ) );
-			# temporarily disable Google Captcha (reCAPTCHA) by BestWebSoft plugin action
-			if ( is_callable( 'gglcptch_register_check' ) )
-				remove_action( 'registration_errors', 'gglcptch_register_check' );
+			remove_all_filters( 'registration_errors' );
 			$user_id = register_new_user( $login, $email );
-			if ( is_callable( 'gglcptch_register_check' ) )
-				add_action( 'registration_errors', 'gglcptch_register_check' );
 			if ( is_wp_error( $user_id ) )
 				kgr_social_login_error( 'error during user registration' );
 		} else {
